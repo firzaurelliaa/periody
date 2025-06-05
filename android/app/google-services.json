@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "66192424676",
+    "project_id": "periody-a3a06",
+    "storage_bucket": "periody-a3a06.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:66192424676:android:1be277de3aae2199c0b6f1",
+        "android_client_info": {
+          "package_name": "com.example.periody"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADcOC0LxYiBOyzIQxZtFqUWf-PZ19dWCk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
