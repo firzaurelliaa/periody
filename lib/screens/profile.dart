@@ -1,28 +1,49 @@
 import 'package:flutter/material.dart';
+import 'edit_profile.dart';
 
 class Profile extends StatelessWidget {
   const Profile({super.key});
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
+          // Bagian latar belakang dengan ClipPath dan gambar
           ClipPath(
-            clipper: _ProfileClipper(),
+            clipper:
+                _ProfileClipper(), // Menggunakan CustomClipper yang didefinisikan di bawah
             child: Container(
-              height: 180, 
-              color: Color(0xFFF48A8A), 
+              height: 180,
+              color: const Color(0xFFF48A8A), // Warna latar belakang
+              child: Image.asset(
+                'assets/img/texture.png', // Pastikan path gambar ini benar
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                // Tambahkan placeholder jika gambar tidak ditemukan
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Color(
+                      0xFFF48A8A,
+                    ),
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.image_not_supported,
+                      color: Colors.white,
+                    ),
+                  );
+                },
+              ),
             ),
           ),
-          
+
           SingleChildScrollView(
-            padding: EdgeInsets.only(top: 60), 
             physics: NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.only(top: 60),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildProfileHeader(),
-                SizedBox(height: 20),
+                _buildProfileHeader(context), // Memanggil method header profil
+                const SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.only(
                     left: 20,
@@ -38,59 +59,89 @@ class Profile extends StatelessWidget {
                     ),
                   ),
                 ),
-                _buildProfileOptions(context),
-                SizedBox(height: 20),
-                _buildLogoutButton(context),
-                SizedBox(height: 80), 
+                _buildProfileOptions(context), // Memanggil method opsi profil
+                const SizedBox(height: 20),
+                _buildLogoutButton(context), // Memanggil method tombol logout
+                const SizedBox(height: 80), // Ruang di bagian bawah
               ],
             ),
           ),
         ],
       ),
+      
     );
   }
 
-  Widget _buildProfileHeader() {
+  // Metode untuk membangun bagian header profil
+  Widget _buildProfileHeader(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
       child: Center(
         child: Column(
           children: [
             Stack(
-              alignment: Alignment.bottomRight,
+              alignment:
+                  Alignment
+                      .bottomRight, // Menempatkan tombol edit di kanan bawah avatar
               children: [
                 Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Color(0xFFFFFFFF), width: 4.0),
+                    border: Border.all(
+                      color: const Color(0xFFFFFFFF),
+                      width: 4.0,
+                    ), // Border putih pada avatar
                   ),
-                  child: CircleAvatar(
+                  child: const CircleAvatar(
                     radius: 50,
-                    backgroundColor: Color(0xFFFEF3F3),
+                    backgroundColor: Color(
+                      0xFFFEF3F3,
+                    ), // Warna latar belakang avatar
                     backgroundImage: AssetImage(
                       'assets/img/profilepic.png',
-                    ), 
+                    ), // Pastikan path gambar ini benar
                   ),
                 ),
-                CircleAvatar(
-                  backgroundColor: Color(0xFFF48A8A),
-                  radius: 16,
-                  child: Icon(Icons.edit, color: Color(0xFFFFFFFF), size: 18),
+                // Tombol edit profil
+                IconButton(
+                  icon: const CircleAvatar(
+                    backgroundColor: Color(
+                      0xFFF48A8A,
+                    ), // Warna latar belakang lingkaran tombol
+                    radius: 16,
+                    child: Icon(
+                      Icons.edit,
+                      color: Color(0xFFFFFFFF), // Warna ikon
+                      size: 18,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) =>
+                                const EditProfile(), // Navigasi ke EditProfile
+                      ),
+                    );
+                    debugPrint(
+                      'Tombol edit ditekan, menavigasi ke EditProfile',
+                    ); // Menggunakan debugPrint
+                  },
                 ),
               ],
             ),
-            SizedBox(height: 10),
-            Text(
-              'Iah Sopiah',
+            const SizedBox(height: 10),
+            const Text(
+              'Iah Sopiah', // Nama pengguna
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 22,
                 color: Color(0xFF383838),
               ),
             ),
-
-            Text(
-              'sophiaayyara@gmail.com',
+            const Text(
+              'sophiaayyara@gmail.com', // Email pengguna
               style: TextStyle(color: Color(0xFF929292), fontSize: 16),
             ),
           ],
@@ -108,10 +159,10 @@ class Profile extends StatelessWidget {
             icon: Icons.info,
             title: 'Tentang Periody',
             subtitle: 'Ketahui tentang Periody',
-            backgroundColor: Color(0xFFFEF3F3), 
-            iconColor: Color(0xFFFFFFFF), 
-            textColor: Colors.black87, 
-            subtitleColor: Color(0xFF929292), 
+            backgroundColor: Color(0xFFFEF3F3),
+            iconColor: Color(0xFFFFFFFF),
+            textColor: Colors.black87,
+            subtitleColor: Color(0xFF929292),
             arrowColor: Color(0xFFF48A8A),
             onTap: () {
               print('Tentang Periody tapped');
@@ -196,10 +247,7 @@ class Profile extends StatelessWidget {
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: Color(0xFFFCDBDB), 
-            width: 1.2, 
-          ),
+          border: Border.all(color: Color(0xFFFCDBDB), width: 1.2),
         ),
         child: Row(
           children: [
@@ -207,11 +255,11 @@ class Profile extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 Container(
-                  width: 36, 
+                  width: 36,
                   height: 36,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Color(0xFFF48A8A), 
+                    color: Color(0xFFF48A8A),
                   ),
                 ),
                 Icon(icon, color: iconColor, size: 20),
@@ -273,8 +321,6 @@ class Profile extends StatelessWidget {
     );
   }
 }
-
-
 class _ProfileClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
