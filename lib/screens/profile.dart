@@ -42,7 +42,7 @@ class Profile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildProfileHeader(context), // Memanggil method header profil
+                _buildProfileHeader(context), 
                 const SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.only(
@@ -59,10 +59,10 @@ class Profile extends StatelessWidget {
                     ),
                   ),
                 ),
-                _buildProfileOptions(context), // Memanggil method opsi profil
+                _buildProfileOptions(context), 
                 const SizedBox(height: 20),
-                _buildLogoutButton(context), // Memanggil method tombol logout
-                const SizedBox(height: 80), // Ruang di bagian bawah
+                _buildLogoutButton(context), 
+                const SizedBox(height: 80), 
               ],
             ),
           ),
@@ -72,7 +72,6 @@ class Profile extends StatelessWidget {
     );
   }
 
-  // Metode untuk membangun bagian header profil
   Widget _buildProfileHeader(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
@@ -82,7 +81,7 @@ class Profile extends StatelessWidget {
             Stack(
               alignment:
                   Alignment
-                      .bottomRight, // Menempatkan tombol edit di kanan bawah avatar
+                      .bottomRight, 
               children: [
                 Container(
                   decoration: BoxDecoration(
@@ -90,28 +89,28 @@ class Profile extends StatelessWidget {
                     border: Border.all(
                       color: const Color(0xFFFFFFFF),
                       width: 4.0,
-                    ), // Border putih pada avatar
+                    ), 
                   ),
                   child: const CircleAvatar(
                     radius: 50,
                     backgroundColor: Color(
                       0xFFFEF3F3,
-                    ), // Warna latar belakang avatar
+                    ), 
                     backgroundImage: AssetImage(
                       'assets/img/profilepic.png',
-                    ), // Pastikan path gambar ini benar
+                    ), 
                   ),
                 ),
-                // Tombol edit profil
+                
                 IconButton(
                   icon: const CircleAvatar(
                     backgroundColor: Color(
                       0xFFF48A8A,
-                    ), // Warna latar belakang lingkaran tombol
+                    ), 
                     radius: 16,
                     child: Icon(
                       Icons.edit,
-                      color: Color(0xFFFFFFFF), // Warna ikon
+                      color: Color(0xFFFFFFFF),
                       size: 18,
                     ),
                   ),
@@ -121,19 +120,19 @@ class Profile extends StatelessWidget {
                       MaterialPageRoute(
                         builder:
                             (context) =>
-                                const EditProfile(), // Navigasi ke EditProfile
+                                const EditProfile(), 
                       ),
                     );
                     debugPrint(
                       'Tombol edit ditekan, menavigasi ke EditProfile',
-                    ); // Menggunakan debugPrint
+                    ); 
                   },
                 ),
               ],
             ),
             const SizedBox(height: 10),
             const Text(
-              'Iah Sopiah', // Nama pengguna
+              'Iah Sopiah', 
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 22,
@@ -141,7 +140,7 @@ class Profile extends StatelessWidget {
               ),
             ),
             const Text(
-              'sophiaayyara@gmail.com', // Email pengguna
+              'sophiaayyara@gmail.com', 
               style: TextStyle(color: Color(0xFF929292), fontSize: 16),
             ),
           ],

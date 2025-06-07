@@ -27,7 +27,6 @@ class Register extends StatelessWidget {
                 ),
               ),
 
-              // --- Tombol Back (Panah Kiri) ---
               Positioned(
                 top: MediaQuery.of(context).padding.top + 12,
                 left: 24,
@@ -40,7 +39,6 @@ class Register extends StatelessWidget {
                 ),
               ),
 
-              // --- Lapisan 3: Konten Utama Register (Teks, Input, Tombol, dll.) ---
               Column(
                 children: <Widget>[
                   // Top section with "Daftar" text
@@ -51,7 +49,6 @@ class Register extends StatelessWidget {
                     ),
                     child: Column(
                       children: <Widget>[
-                        // Logo dihapus di sini karena di desain register tidak ada logo di atas
                         const Text(
                           'Daftar',
                           style: TextStyle(
@@ -60,12 +57,10 @@ class Register extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        // 'Senang kembali bertemu denganmu!' juga dihapus
                       ],
                     ),
                   ),
 
-                  // Bagian form registrasi (diatur dalam container putih melengkung)
                   Expanded(
                     child: Container(
                       decoration: const BoxDecoration(color: Colors.white),
@@ -73,7 +68,6 @@ class Register extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          // --- CustomInputField untuk Nama ---
                           CustomInputField(
                             labelText: 'Nama',
                             hintText: 'Masukkan nama',
@@ -81,7 +75,6 @@ class Register extends StatelessWidget {
                           ),
                           const SizedBox(height: 20),
 
-                          // --- CustomInputField untuk No. Hp ---
                           CustomInputField(
                             labelText: 'No. Hp',
                             hintText: 'Masukkan no hp',
@@ -89,7 +82,7 @@ class Register extends StatelessWidget {
                           ),
                           const SizedBox(height: 20),
 
-                          // --- CustomInputField untuk Email ---
+                          
                           CustomInputField(
                             labelText: 'Email',
                             hintText: 'Masukkan email',
@@ -97,7 +90,6 @@ class Register extends StatelessWidget {
                           ),
                           const SizedBox(height: 20),
 
-                          // --- CustomInputField untuk Kata Sandi ---
                           CustomInputField(
                             labelText: 'Kata Sandi',
                             hintText: 'Minimal 8 karakter',
@@ -105,7 +97,6 @@ class Register extends StatelessWidget {
                           ),
                           const SizedBox(height: 20),
 
-                          // --- CustomInputField untuk Konfirmasi Kata Sandi ---
                           CustomInputField(
                             labelText: 'Konfirmasi Kata Sandi',
                             hintText: 'Kata sandi harus sama',
@@ -113,14 +104,13 @@ class Register extends StatelessWidget {
                           ),
                           const SizedBox(height: 10),
 
-                          // --- Teks Syarat & Ketentuan ---
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10.0),
                             child: RichText(
                               text: const TextSpan(
                                 text: 'Dengan mendaftar. Anda menyetujui ',
                                 style: TextStyle(
-                                  color: Color(0xFF929292), // Warna abu-abu
+                                  color: Color(0xFF929292), 
                                   fontSize: 14,
                                 ),
                                 children: <TextSpan>[
@@ -129,14 +119,10 @@ class Register extends StatelessWidget {
                                     style: TextStyle(
                                       color: Color(
                                         0xFFF48A8A,
-                                      ), // Warna merah muda
+                                      ), 
                                       fontWeight: FontWeight
-                                          .bold, // Mungkin sedikit bold atau hanya warna
+                                          .bold,
                                     ),
-                                    // Anda bisa menambahkan recognizer di sini jika ingin link bisa diklik
-                                    // recognizer: TapGestureRecognizer()..onTap = () {
-                                    //   print('Ketentuan & Kebijakan Privasi clicked!');
-                                    // },
                                   ),
                                   TextSpan(
                                     text: ' kami',
@@ -151,7 +137,6 @@ class Register extends StatelessWidget {
                           ),
                           const SizedBox(height: 20),
 
-                          // --- Tombol Daftar ---
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
@@ -181,7 +166,6 @@ class Register extends StatelessWidget {
                           ),
                           const SizedBox(height: 12),
 
-                          // --- Bagian "Sudah punya akun?" ---
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[

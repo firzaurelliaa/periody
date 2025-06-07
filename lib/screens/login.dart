@@ -14,7 +14,6 @@ class Login extends StatelessWidget {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: <Widget>[
-              // --- Lapisan 1: Gambar Latar Belakang ---
               Positioned.fill(
                 child: Image.asset(
                   'assets/images/login_bg.png',
@@ -22,7 +21,6 @@ class Login extends StatelessWidget {
                 ),
               ),
 
-              // --- Lapisan 3: Konten Utama Login (Teks, Input, Tombol, dll.) ---
               Column(
                 children: <Widget>[
                   // Top section with Logo and "Login" text
@@ -65,23 +63,20 @@ class Login extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          // --- Panggil CustomInputField untuk Email ---
                           CustomInputField(
                             labelText: 'Email',
                             hintText: 'Masukkan email',
                             keyboardType: TextInputType.emailAddress,
-                            // obscureText tidak perlu diset karena defaultnya sudah false di CustomInputField
                           ),
-                          const SizedBox(height: 20), // Spasi antar input field
-                          // --- Panggil CustomInputField untuk Kata Sandi ---
+                          const SizedBox(height: 20), 
                           CustomInputField(
                             labelText: 'Kata Sandi',
                             hintText: 'Minimal 8 karakter',
-                            obscureText: true, // Kata sandi harus di-obscure
+                            obscureText: true, 
                           ),
                           const SizedBox(
                             height: 10,
-                          ), // Spasi sebelum lupa kata sandi
+                          ), 
 
                           Align(
                             alignment: Alignment.centerRight,
@@ -100,7 +95,6 @@ class Login extends StatelessWidget {
                           ),
                           const SizedBox(height: 20),
 
-                          // --- ElevatedButton untuk Login (dikembalikan ke semula) ---
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
@@ -130,7 +124,7 @@ class Login extends StatelessWidget {
 
                           const SizedBox(
                             height: 12,
-                          ), // Spasi sebelum "Belum punya akun?"
+                          ), 
 
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -148,7 +142,7 @@ class Login extends StatelessWidget {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          const Register(), // Memanggil RegisterPage
+                                          const Register(), 
                                     ),
                                   );
                                   print(
