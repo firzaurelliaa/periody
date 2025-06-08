@@ -1,13 +1,11 @@
-// File: lib/widgets/status_alert.dart
-
 import 'package:flutter/material.dart';
 
-// Enum untuk mendefinisikan tipe status alert
-enum AlertStatus { normal, berpotensi, berisiko }
+// Enum untuk status alert
+enum AlertStatus { normal, potential, risky }
 
 class StatusAlert extends StatelessWidget {
   final AlertStatus status;
-  final VoidCallback? onTap; // Menambahkan callback onTap agar bisa diklik
+  final VoidCallback? onTap;
 
   const StatusAlert({
     Key? key,
@@ -19,53 +17,65 @@ class StatusAlert extends StatelessWidget {
   Widget build(BuildContext context) {
     Color backgroundColor;
     Color textColor;
-    IconData icon;
+    IconData iconData;
     String text;
 
-    // Menentukan warna, ikon, dan teks berdasarkan status
     switch (status) {
       case AlertStatus.normal:
-        backgroundColor = Colors.green.shade100;
-        textColor = Colors.green;
-        icon = Icons.spa; // Menggunakan ikon daun/tunas seperti di gambar Alert.png
+        backgroundColor = const Color(0xFFE0FFEF); // Green background
+        textColor = const Color(0xFF28A745); // Darker green text
+        iconData = Icons.grass; // Icon rumput
         text = 'Normal';
         break;
-      case AlertStatus.berpotensi:
-        backgroundColor = Colors.orange.shade100;
-        textColor = Colors.orange.shade700;
-        icon = Icons.warning_amber_rounded;
+      case AlertStatus.potential:
+        backgroundColor = const Color(0xFFFFF3CD); // Yellow background
+        textColor = const Color(0xFFFFC107); // Orange-yellow text
+        iconData = Icons.warning_amber_rounded; // Icon warning
         text = 'Berpotensi';
         break;
-      case AlertStatus.berisiko:
-        backgroundColor = Colors.red.shade100;
-        textColor = Colors.red;
-        icon = Icons.cancel_outlined; // Menggunakan ikon cancel untuk Berisiko
+      case AlertStatus.risky:
+        backgroundColor = const Color(0xFFF8D7DA); // Red background
+        textColor = const Color(0xFFDC3545); // Darker red text
+        iconData = Icons.crisis_alert; // Icon risiko
         text = 'Berisiko';
         break;
-      // Default case jika ada status yang tidak terdefinisi
-      default:
-        backgroundColor = Colors.grey.shade100;
-        textColor = Colors.grey;
-        icon = Icons.info_outline;
-        text = 'Unknown';
     }
 
     return GestureDetector(
-      onTap: onTap, // Menerapkan callback onTap
+      onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+        width: 150, // Lebar fixed sesuai desain (bisa disesuaikan)
+        height: 50, // Tinggi fixed
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: BorderRadius.circular(20), // Bentuk kapsul
+          borderRadius: BorderRadius.circular(25), // Bentuk pill
+          boxShadow: [ // Shadow ringan seperti di desain
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.min, // Agar Container mengikuti ukuran kontennya
+          mainAxisSize: MainAxisSize.min, // Agar row tidak mengambil lebar penuh
+          mainAxisAlignment: MainAxisAlignment.center, // Pusatkan konten
           children: [
-            Icon(icon, color: textColor, size: 20),
+            Icon(
+              iconData,
+              color: textColor,
+              size: 20, // Ukuran ikon
+            ),
             const SizedBox(width: 8),
             Text(
               text,
-              style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: textColor,
+                fontSize: 16, // Ukuran font
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),

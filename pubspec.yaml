@@ -98,6 +98,7 @@ flutter:
     - assets/img/lelah.gif
     - assets/img/profilepic.png
     - assets/img/darah.png
+    - assets/img/Banner.png
     
 
   # An image asset can refer to one or more resolution-specific "variants", see
