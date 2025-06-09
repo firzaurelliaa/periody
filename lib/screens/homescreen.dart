@@ -7,12 +7,11 @@ import 'package:periody/screens/edukasi.dart';
 import 'package:periody/screens/add_note_page.dart';
 import 'package:periody/screens/article_detail_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:periody/models/article.dart'; // Import your Article model
+import 'package:periody/models/article.dart';
 
 class Homescreen extends StatelessWidget {
   const Homescreen({super.key});
 
-  // Helper method to build cycle info widgets
   Widget _buildCycleInfo({
     required IconData icon,
     required String title,
@@ -74,7 +73,7 @@ class Homescreen extends StatelessWidget {
                           child:
                               const Icon(Icons.person, color: Color(0xFF383838)),
                         ),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         const Text(
                           'Halo, Elvira!',
                           style: TextStyle(
@@ -129,8 +128,7 @@ class Homescreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      // Tambahkan padding di sini untuk jarak konten dari tepi container
-                      padding: const EdgeInsets.all(32.0), 
+                      padding: const EdgeInsets.all(32.0),
                       child: CycleVisualizer(
                         currentDay: 7,
                         totalDaysInCycle: 28,
@@ -143,8 +141,8 @@ class Homescreen extends StatelessWidget {
                   ),
                   SizedBox(height: screenHeight * 0.025),
                   Center(
-                    // Memasukkan StatusAlert ke dalam Container baru dengan dekorasi
                     child: Container(
+                      width: double.infinity,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(15),
@@ -157,8 +155,7 @@ class Homescreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      // Opsional: tambahkan padding jika StatusAlert butuh ruang di dalamnya
-                      padding: const EdgeInsets.all(0), // Sesuaikan jika perlu padding internal
+                      padding: const EdgeInsets.all(16.0),
                       child: StatusAlert(
                         status: AlertStatus.normal,
                         onTap: () {
@@ -172,7 +169,6 @@ class Homescreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
                   SizedBox(height: screenHeight * 0.025),
                   Container(
                     height: screenHeight * 0.2,
