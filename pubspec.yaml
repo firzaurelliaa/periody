@@ -96,6 +96,7 @@ flutter:
     - assets/img/cemas.gif
     - assets/img/lelah.gif
     - assets/img/profilepic.png
+    - assets/img/Banner.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
