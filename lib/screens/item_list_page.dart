@@ -1,3 +1,5 @@
+// ignore_for_file: use_super_parameters, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:periody/models/item.dart';
@@ -18,7 +20,6 @@ class _ItemListPageState extends State<ItemListPage> {
   final TextEditingController _editNameController = TextEditingController();
   final TextEditingController _editQuantityController = TextEditingController();
 
-  // --- CREATE (Menambah Data) ---
   Future<void> _addItem() async {
     if (_nameController.text.isEmpty || _quantityController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -42,15 +43,13 @@ class _ItemListPageState extends State<ItemListPage> {
     }
   }
 
-  // --- READ (Membaca Data) ---
-  // Menggunakan StreamBuilder untuk realtime updates
+
   Stream<List<Item>> _readItems() {
     return _firestore.collection('items').orderBy('timestamp', descending: true).snapshots().map((snapshot) {
       return snapshot.docs.map((doc) => Item.fromFirestore(doc.data(), doc.id)).toList();
     });
   }
 
-  // --- UPDATE (Mengubah Data) ---
   Future<void> _updateItem(Item item) async {
     _editNameController.text = item.name;
     _editQuantityController.text = item.quantity.toString();

@@ -1,3 +1,5 @@
+// ignore_for_file: use_super_parameters, avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:periody/models/article.dart';
@@ -5,7 +7,9 @@ import 'package:periody/screens/add_article.dart';
 import 'package:periody/screens/article_detail_page.dart';
 
 class Edukasi extends StatefulWidget {
-  const Edukasi({Key? key}) : super(key: key);
+  final String userRole;
+
+  const Edukasi({Key? key, required this.userRole}) : super(key: key);
 
   @override
   State<Edukasi> createState() => _EdukasiState();
@@ -15,12 +19,14 @@ class _EdukasiState extends State<Edukasi> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String _selectedCategory = 'Rekomendasi';
 
-  final List<String> _categories = const ['Rekomendasi', 'Terbaru', 'Trending'];
+  final List<String> _categories = ['Rekomendasi', 'Terbaru', 'Trending'];
 
   @override
   Widget build(BuildContext context) {
+    bool isAdmin = widget.userRole == 'admin';
+
     return Scaffold(
-      backgroundColor: Color(0xfffefefe),
+      backgroundColor: const Color(0xfffefefe),
       appBar: AppBar(
         backgroundColor: const Color(0xffF48A8A),
         elevation: 0,
@@ -34,15 +40,16 @@ class _EdukasiState extends State<Edukasi> {
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add, color: Colors.white),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AddArticlePage()),
-              );
-            },
-          ),
+          if (isAdmin)
+            IconButton(
+              icon: const Icon(Icons.add, color: Colors.white),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AddArticlePage()),
+                );
+              },
+            ),
         ],
       ),
       body: Column(
@@ -108,9 +115,7 @@ class _EdukasiState extends State<Edukasi> {
                       borderRadius: BorderRadius.circular(20),
                       side: BorderSide(
                         color:
-                            isSelected
-                                ? Colors.transparent
-                                : Colors.transparent,
+                            isSelected ? Colors.transparent : Colors.transparent,
                       ),
                     ),
                     backgroundColor: Colors.transparent,
@@ -147,9 +152,7 @@ class _EdukasiState extends State<Edukasi> {
                     final article = articles[index];
 
                     bool isHighlight =
-                        index == 0 &&
-                        (_selectedCategory == 'Rekomendasi' ||
-                            _selectedCategory == 'Terbaru');
+                        index == 0 && (_selectedCategory == 'Rekomendasi' || _selectedCategory == 'Terbaru');
 
                     if (isHighlight) {
                       return Padding(
@@ -158,7 +161,7 @@ class _EdukasiState extends State<Edukasi> {
                           vertical: 8.0,
                         ),
                         child: Card(
-                          margin: EdgeInsets.symmetric(vertical: 8),
+                          margin: const EdgeInsets.symmetric(vertical: 8),
                           elevation: 0,
                           color: Colors.white,
                           clipBehavior: Clip.antiAlias,
@@ -170,9 +173,7 @@ class _EdukasiState extends State<Edukasi> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder:
-                                      (context) =>
-                                          ArticleDetailPage(article: article),
+                                  builder: (context) => ArticleDetailPage(article: article),
                                 ),
                               );
                             },
@@ -187,9 +188,6 @@ class _EdukasiState extends State<Edukasi> {
                                   width: double.infinity,
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
-                                    print(
-                                      'Error loading image for highlight: $error',
-                                    ); // Debugging image load error
                                     return Container(
                                       height: 180,
                                       width: double.infinity,
@@ -220,7 +218,7 @@ class _EdukasiState extends State<Edukasi> {
                                       const SizedBox(height: 4),
                                       Text(
                                         '${article.author} - ${article.publishDate.day}/${article.publishDate.month}/${article.publishDate.year}',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: Color(0xff929292),
                                           fontSize: 12,
                                         ),
@@ -246,9 +244,7 @@ class _EdukasiState extends State<Edukasi> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder:
-                                    (context) =>
-                                        ArticleDetailPage(article: article),
+                                builder: (context) => ArticleDetailPage(article: article),
                               ),
                             );
                           },
@@ -267,13 +263,10 @@ class _EdukasiState extends State<Edukasi> {
                                     height: 100,
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) {
-                                      print(
-                                        'Error loading image for list item: $error',
-                                      ); // Debugging image load error
                                       return Container(
                                         width: 100,
                                         height: 100,
-
+                                        color: Colors.grey[300],
                                         child: const Icon(
                                           Icons.image_not_supported,
                                           color: Colors.grey,
@@ -284,7 +277,6 @@ class _EdukasiState extends State<Edukasi> {
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
-                                  // Ini penting untuk mengatasi overflow
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -295,10 +287,9 @@ class _EdukasiState extends State<Edukasi> {
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,
                                         ),
-                                        maxLines: 2, // Batasi jumlah baris
+                                        maxLines: 2,
                                         overflow:
-                                            TextOverflow
-                                                .ellipsis, // Tambahkan ellipsis
+                                            TextOverflow.ellipsis,
                                       ),
                                       const SizedBox(height: 8),
                                       Text(

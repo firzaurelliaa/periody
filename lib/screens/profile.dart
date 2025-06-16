@@ -1,51 +1,94 @@
-import 'package:flutter/material.dart';
-import 'edit_profile.dart';
+// ignore_for_file: use_super_parameters, use_build_context_synchronously
 
-class Profile extends StatelessWidget {
-  const Profile({super.key});
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:periody/screens/edit_profile.dart';
+import 'package:periody/screens/onboarding.dart';
+
+class Profile extends StatefulWidget {
+  final String userRole;
+  const Profile({Key? key, required this.userRole}) : super(key: key);
+
+  @override
+  State<Profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  String _userName = 'Pengguna';
+  String _userEmail = 'email@example.com';
+  String? _profileImageUrl;
+  String _userPhone = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserProfile();
+  }
+
+  Future<void> _fetchUserProfile() async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).get();
+
+      if (userDoc.exists && userDoc.data() != null) {
+        final data = userDoc.data() as Map<String, dynamic>;
+        setState(() {
+          _userName = data['name'] as String? ?? 'Nama Pengguna';
+          _userEmail = currentUser.email ?? 'email@example.com';
+          _profileImageUrl = data['profileImageUrl'] as String?;
+          _userPhone = data['phone'] as String? ?? '';
+        });
+      } else {
+        setState(() {
+          _userName = currentUser.displayName ?? 'Pengguna Baru';
+          _userEmail = currentUser.email ?? 'email@example.com';
+          _userPhone = '';
+        });
+      }
+    }
+  }
+
+  Future<void> _handleLogout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const Onboarding()),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error saat logout: $e')),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    bool isAdmin = widget.userRole == 'admin';
+
     return Scaffold(
       body: Stack(
         children: [
-          // Bagian latar belakang dengan ClipPath dan gambar
           ClipPath(
-            clipper:
-                _ProfileClipper(), // Menggunakan CustomClipper yang didefinisikan di bawah
+            clipper: _ProfileClipper(),
             child: Container(
               height: 180,
-              color: const Color(0xFFF48A8A), // Warna latar belakang
-              child: Image.asset(
-                'assets/img/texture.png', // Pastikan path gambar ini benar
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                // Tambahkan placeholder jika gambar tidak ditemukan
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Color(
-                      0xFFF48A8A,
-                    ),
-                    alignment: Alignment.center,
-                    child: const Icon(
-                      Icons.image_not_supported,
-                      color: Colors.white,
-                    ),
-                  );
-                },
-              ),
+              color: const Color(0xFFF48A8A),
             ),
           ),
-
           SingleChildScrollView(
-            physics: NeverScrollableScrollPhysics(),
             padding: const EdgeInsets.only(top: 60),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildProfileHeader(context), 
+                _buildProfileHeader(context),
                 const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.only(
+                const Padding(
+                  padding: EdgeInsets.only(
                     left: 20,
                     right: 20,
                     bottom: 12,
@@ -59,16 +102,19 @@ class Profile extends StatelessWidget {
                     ),
                   ),
                 ),
-                _buildProfileOptions(context), 
+                _buildProfileOptions(context),
                 const SizedBox(height: 20),
-                _buildLogoutButton(context), 
-                const SizedBox(height: 80), 
+                if (isAdmin)
+                  _buildAdminOptions(context),
+                if (isAdmin)
+                  const SizedBox(height: 20),
+                _buildLogoutButton(context),
+                const SizedBox(height: 80),
               ],
             ),
           ),
         ],
       ),
-      
     );
   }
 
@@ -79,9 +125,7 @@ class Profile extends StatelessWidget {
         child: Column(
           children: [
             Stack(
-              alignment:
-                  Alignment
-                      .bottomRight, 
+              alignment: Alignment.bottomRight,
               children: [
                 Container(
                   decoration: BoxDecoration(
@@ -89,24 +133,22 @@ class Profile extends StatelessWidget {
                     border: Border.all(
                       color: const Color(0xFFFFFFFF),
                       width: 4.0,
-                    ), 
+                    ),
                   ),
-                  child: const CircleAvatar(
+                  child: CircleAvatar(
                     radius: 50,
-                    backgroundColor: Color(
-                      0xFFFEF3F3,
-                    ), 
-                    backgroundImage: AssetImage(
-                      'assets/img/profilepic.png',
-                    ), 
+                    backgroundColor: const Color(0xFFFEF3F3),
+                    backgroundImage: _profileImageUrl != null
+                        ? NetworkImage(_profileImageUrl!) as ImageProvider<Object>?
+                        : const AssetImage('assets/img/profilepic.png'),
+                    onBackgroundImageError: (exception, stackTrace) {
+                      debugPrint('Error loading profile image: $exception');
+                    },
                   ),
                 ),
-                
                 IconButton(
                   icon: const CircleAvatar(
-                    backgroundColor: Color(
-                      0xFFF48A8A,
-                    ), 
+                    backgroundColor: Color(0xFFF48A8A),
                     radius: 16,
                     child: Icon(
                       Icons.edit,
@@ -118,30 +160,34 @@ class Profile extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder:
-                            (context) =>
-                                const EditProfile(), 
+                        builder: (context) => EditProfile(
+                          currentName: _userName,
+                          currentEmail: _userEmail,
+                          currentPhone: _userPhone,
+                          currentProfileImageUrl: _profileImageUrl,
+                        ),
                       ),
-                    );
-                    debugPrint(
-                      'Tombol edit ditekan, menavigasi ke EditProfile',
-                    ); 
+                    ).then((value) {
+                      if (value == true) {
+                        _fetchUserProfile();
+                      }
+                    });
                   },
                 ),
               ],
             ),
             const SizedBox(height: 10),
-            const Text(
-              'Iah Sopiah', 
-              style: TextStyle(
+            Text(
+              _userName,
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 22,
                 color: Color(0xFF383838),
               ),
             ),
-            const Text(
-              'sophiaayyara@gmail.com', 
-              style: TextStyle(color: Color(0xFF929292), fontSize: 16),
+            Text(
+              _userEmail,
+              style: const TextStyle(color: Color(0xFF929292), fontSize: 16),
             ),
           ],
         ),
@@ -158,70 +204,103 @@ class Profile extends StatelessWidget {
             icon: Icons.info,
             title: 'Tentang Periody',
             subtitle: 'Ketahui tentang Periody',
-            backgroundColor: Color(0xFFFEF3F3),
-            iconColor: Color(0xFFFFFFFF),
+            backgroundColor: const Color(0xFFFEF3F3),
+            iconColor: const Color(0xFFFFFFFF),
             textColor: Colors.black87,
-            subtitleColor: Color(0xFF929292),
-            arrowColor: Color(0xFFF48A8A),
-            onTap: () {
-              print('Tentang Periody tapped');
-            },
+            subtitleColor: const Color(0xFF929292),
+            arrowColor: const Color(0xFFF48A8A),
+            onTap: () {},
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           _buildOptionItem(
             icon: Icons.lock,
             title: 'Keamanan dan Privasi',
             subtitle: 'Atur keamanan dan privasi',
-            backgroundColor: Color(0xFFFEF3F3),
-            iconColor: Color(0xFFFFFFFF),
+            backgroundColor: const Color(0xFFFEF3F3),
+            iconColor: const Color(0xFFFFFFFF),
             textColor: Colors.black87,
-            subtitleColor: Color(0xFF929292),
-            arrowColor: Color(0xFFF48A8A),
-            onTap: () {
-              print('Keamanan dan Privasi tapped');
-            },
+            subtitleColor: const Color(0xFF929292),
+            arrowColor: const Color(0xFFF48A8A),
+            onTap: () {},
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           _buildOptionItem(
             icon: Icons.settings,
             title: 'Pengaturan',
             subtitle: 'Atur pengaturan aplikasi',
-            backgroundColor: Color(0xFFFEF3F3),
-            iconColor: Color(0xFFFFFFFF),
+            backgroundColor: const Color(0xFFFEF3F3),
+            iconColor: const Color(0xFFFFFFFF),
             textColor: Colors.black87,
-            subtitleColor: Color(0xFF929292),
-            arrowColor: Color(0xFFF48A8A),
-            onTap: () {
-              print('Pengaturan tapped');
-            },
+            subtitleColor: const Color(0xFF929292),
+            arrowColor: const Color(0xFFF48A8A),
+            onTap: () {},
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           _buildOptionItem(
             icon: Icons.question_mark,
             title: 'FAQ & Panduan',
             subtitle: 'Lihat FAQ dan panduan',
-            backgroundColor: Color(0xFFFEF3F3),
-            iconColor: Color(0xFFFFFFFF),
+            backgroundColor: const Color(0xFFFEF3F3),
+            iconColor: const Color(0xFFFFFFFF),
             textColor: Colors.black87,
-            subtitleColor: Color(0xFF929292),
-            arrowColor: Color(0xFFF48A8A),
-            onTap: () {
-              print('FAQ & Panduan tapped');
-            },
+            subtitleColor: const Color(0xFF929292),
+            arrowColor: const Color(0xFFF48A8A),
+            onTap: () {},
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           _buildOptionItem(
             icon: Icons.phone,
             title: 'Laporkan Masalah',
             subtitle: 'Laporkan ketika menemukan masalah',
-            backgroundColor: Color(0xFFFEF3F3),
-            iconColor: Color(0xFFFFFFFF),
+            backgroundColor: const Color(0xFFFEF3F3),
+            iconColor: const Color(0xFFFFFFFF),
             textColor: Colors.black87,
-            subtitleColor: Color(0xFF929292),
-            arrowColor: Color(0xFFF48A8A),
-            onTap: () {
-              print('Laporkan Masalah tapped');
-            },
+            subtitleColor: const Color(0xFF929292),
+            arrowColor: const Color(0xFFF48A8A),
+            onTap: () {},
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAdminOptions(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Admin Panel',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: Color(0xFF383838),
+            ),
+          ),
+          const SizedBox(height: 10),
+          _buildOptionItem(
+            icon: Icons.people,
+            title: 'Kelola Pengguna',
+            subtitle: 'Tambah, edit, atau hapus pengguna',
+            backgroundColor: const Color(0xFFFEF3F3),
+            iconColor: const Color(0xFFFFFFFF),
+            textColor: Colors.black87,
+            subtitleColor: const Color(0xFF929292),
+            arrowColor: const Color(0xFFF48A8A),
+            onTap: () {},
+          ),
+          const SizedBox(height: 10),
+          _buildOptionItem(
+            icon: Icons.analytics,
+            title: 'Laporan & Statistik',
+            subtitle: 'Lihat data dan analitik aplikasi',
+            backgroundColor: const Color(0xFFFEF3F3),
+            iconColor: const Color(0xFFFFFFFF),
+            textColor: Colors.black87,
+            subtitleColor: const Color(0xFF929292),
+            arrowColor: const Color(0xFFF48A8A),
+            onTap: () {},
           ),
         ],
       ),
@@ -242,11 +321,11 @@ class Profile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Color(0xFFFCDBDB), width: 1.2),
+          border: Border.all(color: const Color(0xFFFCDBDB), width: 1.2),
         ),
         child: Row(
           children: [
@@ -256,7 +335,7 @@ class Profile extends StatelessWidget {
                 Container(
                   width: 36,
                   height: 36,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: Color(0xFFF48A8A),
                   ),
@@ -264,7 +343,7 @@ class Profile extends StatelessWidget {
                 Icon(icon, color: iconColor, size: 20),
               ],
             ),
-            SizedBox(width: 15),
+            const SizedBox(width: 15),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -277,7 +356,7 @@ class Profile extends StatelessWidget {
                       color: textColor,
                     ),
                   ),
-                  SizedBox(height: 3),
+                  const SizedBox(height: 3),
                   Text(
                     subtitle,
                     style: TextStyle(color: subtitleColor, fontSize: 14),
@@ -296,17 +375,15 @@ class Profile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: ElevatedButton(
-        onPressed: () {
-          print('Keluar button tapped');
-        },
+        onPressed: _handleLogout,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFFF48A8A),
-          padding: EdgeInsets.symmetric(vertical: 12),
+          backgroundColor: const Color(0xFFF48A8A),
+          padding: const EdgeInsets.symmetric(vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(50),
           ),
         ),
-        child: Center(
+        child: const Center(
           child: Text(
             'Keluar',
             style: TextStyle(
@@ -320,6 +397,7 @@ class Profile extends StatelessWidget {
     );
   }
 }
+
 class _ProfileClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {

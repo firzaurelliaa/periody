@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:periody/models/article.dart'; 
@@ -10,19 +12,18 @@ class AddArticlePage extends StatefulWidget {
 }
 
 class _AddArticlePageState extends State<AddArticlePage> {
-  final _formKey = GlobalKey<FormState>(); // Kunci untuk validasi form
+  final _formKey = GlobalKey<FormState>();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Controllers untuk setiap input field
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
   final TextEditingController _imageUrlController = TextEditingController();
   final TextEditingController _authorController = TextEditingController();
   final TextEditingController _categoryController = TextEditingController();
-  final TextEditingController _tagsController = TextEditingController(); // Untuk tag, dipisahkan koma
+  final TextEditingController _tagsController = TextEditingController();
   
-  // Menambahkan _selectedCategory untuk dropdown
-  String _selectedCategoryDropdown = 'Rekomendasi'; // Default category for dropdown
+
+  String _selectedCategoryDropdown = 'Rekomendasi'; 
   final List<String> _dropdownCategories = const [
     'Rekomendasi',
     'Terbaru',
@@ -35,12 +36,12 @@ class _AddArticlePageState extends State<AddArticlePage> {
     _contentController.dispose();
     _imageUrlController.dispose();
     _authorController.dispose();
-    _categoryController.dispose(); // Masih dibutuhkan jika Anda ingin membiarkan input manual
+    _categoryController.dispose();
     _tagsController.dispose();
     super.dispose();
   }
 
-  // Fungsi untuk menambahkan artikel ke Firestore
+
   Future<void> _addArticle() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -51,20 +52,15 @@ class _AddArticlePageState extends State<AddArticlePage> {
           .where((tag) => tag.isNotEmpty)
           .toList();
 
-      // Anda bisa menambahkan default nilai untuk readCount dan featured jika tidak ada di form
+
       final newArticle = Article(
         title: _titleController.text,
         content: _contentController.text,
         imageUrl: _imageUrlController.text,
         author: _authorController.text.isNotEmpty ? _authorController.text : 'Periody Team',
         publishDate: DateTime.now(),
-        category: _selectedCategoryDropdown, // Menggunakan nilai dari dropdown
+        category: _selectedCategoryDropdown,
         tags: tags,
-        // readCount: 0, // Nilai default untuk artikel baru
-        // featured: false, // Nilai default untuk artikel baru
-        // subtitle: _contentController.text.length > 100 // Menambahkan subtitle otomatis dari content
-        //     ? '${_contentController.text.substring(0, 100)}...'
-        //     : _contentController.text,
       );
 
       try {
@@ -73,14 +69,13 @@ class _AddArticlePageState extends State<AddArticlePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Artikel berhasil ditambahkan!')),
         );
-        // Kosongkan form setelah sukses
         _titleController.clear();
         _contentController.clear();
         _imageUrlController.clear();
         _authorController.clear();
         _tagsController.clear();
         setState(() {
-          _selectedCategoryDropdown = 'Rekomendasi'; // Reset dropdown
+          _selectedCategoryDropdown = 'Rekomendasi';
         });
 
         Navigator.pop(context);
@@ -98,11 +93,21 @@ class _AddArticlePageState extends State<AddArticlePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tambah Artikel Baru'),
+        centerTitle: true,
+        title: const Text('Tambah Artikel', style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 20.0,
+        ),),
         backgroundColor: const Color(0xFFF48A8A),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          onPressed: () => Navigator.of(context).pop(),
+          color: Colors.white,
+        ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Form(
           key: _formKey,
           child: Column(
@@ -146,7 +151,6 @@ class _AddArticlePageState extends State<AddArticlePage> {
                 decoration: const InputDecoration(labelText: 'Penulis (Opsional)'),
               ),
               const SizedBox(height: 10),
-              // Mengubah input kategori menjadi DropdownButton
               DropdownButtonFormField<String>(
                 value: _selectedCategoryDropdown,
                 decoration: const InputDecoration(
@@ -178,18 +182,33 @@ class _AddArticlePageState extends State<AddArticlePage> {
                     labelText: 'Tags (pisahkan dengan koma, mis: kesehatan, wanita)'),
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
+              Container(
+              margin: const EdgeInsets.only(bottom: 40.0),
+              width: MediaQuery.of(context).size.width,
+              height: 48.0,
+              child: ElevatedButton(
                 onPressed: _addArticle,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF48A8A),
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  backgroundColor: const Color(0xffF48A8A),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 50,
+                    vertical: 15,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  disabledBackgroundColor: const Color(0xffF48A8A).withOpacity(0.5),
                 ),
-                child: const Text(
-                  'Tambah Artikel',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
+                child: Text(
+                        'Tambah Artikel',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
+            ),
             ],
           ),
         ),

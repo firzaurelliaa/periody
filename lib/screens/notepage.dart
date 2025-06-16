@@ -1,8 +1,11 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:periody/models/menstrual_note.dart';
 import 'package:periody/screens/add_note_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class NotePage extends StatefulWidget {
   const NotePage({super.key});
@@ -36,21 +39,12 @@ class _NotePageState extends State<NotePage> {
     'Kelelahan': 'assets/img/lelah.png',
   };
 
-  final Map<String, IconData> _faseIcons = {
-    'Menstruasi': Icons.water_drop,
-    'Ovulasi': Icons.favorite,
-    'PMS': Icons.warning_rounded,
-    'Fase Folikular': Icons.spa,
-    'Fase Luteal': Icons.wb_sunny,
-    'Pre Menstrual S': Icons.flash_on,
-  };
-
   @override
   Widget build(BuildContext context) {
-    String userId = 'contohUserId123';
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
 
     return Scaffold(
-      backgroundColor: Color(0XFFFEFEFE),
+      backgroundColor: const Color(0XFFFEFEFE),
       appBar: AppBar(
         centerTitle: true,
         title: const Text(
@@ -60,7 +54,7 @@ class _NotePageState extends State<NotePage> {
         backgroundColor: const Color(0xffF48A8A),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: userId.isEmpty
+      body: userId == null || userId.isEmpty
           ? const Center(child: Text('Mohon login untuk melihat catatan Anda.'))
           : StreamBuilder<QuerySnapshot>(
               stream: _firestore
@@ -70,13 +64,18 @@ class _NotePageState extends State<NotePage> {
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color:Color(0xffF48A8A),));
+                  return const Center(
+                      child: CircularProgressIndicator(
+                    color: Color(0xffF48A8A),
+                  ));
                 }
                 if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 }
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return const Center(child: Text('Belum ada catatan. Tekan + untuk menambahkan.'));
+                  return const Center(
+                      child:
+                          Text('Belum ada catatan. Tekan + untuk menambahkan.'));
                 }
 
                 final notes = snapshot.data!.docs.map((doc) {
@@ -106,7 +105,7 @@ class _NotePageState extends State<NotePage> {
       ),
     );
   }
-  
+
   Widget _buildNoteCard(MenstrualNote note) {
     return Card(
       margin: const EdgeInsets.only(bottom: 20.0),
@@ -184,15 +183,18 @@ class _NotePageState extends State<NotePage> {
                   if (note.mood.isNotEmpty) ...[
                     _buildDetailRow(
                       'Suasana Hati:',
-                      note.mood.map((m) => _buildChipWithImage(_moodImages[m], m)).toList(),
+                      note.mood
+                          .map((m) => _buildChipWithImage(_moodImages[m], m))
+                          .toList(),
                     ),
-                    
                     const SizedBox(height: 4),
                   ],
                   if (note.gejala.isNotEmpty) ...[
                     _buildDetailRow(
                       'Gejala:',
-                      note.gejala.map((g) => _buildChipWithImage(_gejalaImages[g], g)).toList(),
+                      note.gejala
+                          .map((g) => _buildChipWithImage(_gejalaImages[g], g))
+                          .toList(),
                     ),
                     const SizedBox(height: 4),
                   ],
@@ -205,7 +207,8 @@ class _NotePageState extends State<NotePage> {
                   if (note.catatanTambahan.isNotEmpty)
                     Text(
                       'Catatan: ${note.catatanTambahan}',
-                      style: const TextStyle(fontSize: 14, color: Color(0xFF383838)),
+                      style:
+                          const TextStyle(fontSize: 14, color: Color(0xFF383838)),
                     ),
                 ],
               ),
@@ -248,13 +251,13 @@ class _NotePageState extends State<NotePage> {
   }
 
   Widget _buildTextChip(String label) {
-  return Chip(
-    label: Text(label),
-    backgroundColor: const Color(0xffFDEDED),
-    side: BorderSide.none,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-    padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-    labelStyle: const TextStyle(fontSize: 12, color: Color(0xff383838)),
-  );
-}
+    return Chip(
+      label: Text(label),
+      backgroundColor: const Color(0xffFDEDED),
+      side: BorderSide.none,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+      labelStyle: const TextStyle(fontSize: 12, color: Color(0xff383838)),
+    );
+  }
 }

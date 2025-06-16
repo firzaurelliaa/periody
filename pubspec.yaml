@@ -42,6 +42,7 @@ dependencies:
   flutter_svg: ^2.1.0
   firebase_auth: ^5.5.4
   fl_chart: ^0.68.0
+  flutter_launcher_icons: ^0.13.1
 
   flutter_localizations:
       sdk: flutter
@@ -102,6 +103,7 @@ flutter:
     - assets/img/cemas.gif
     - assets/img/lelah.gif
     - assets/img/profilepic.png
+    - assets/img/Banner.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -132,3 +134,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+
+flutter_launcher_icons:
+  android: "true"
+  ios: "true"
+  image_path: "assets/img/icon.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true

@@ -1,3 +1,5 @@
+// ignore_for_file: use_super_parameters, avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:periody/models/article.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

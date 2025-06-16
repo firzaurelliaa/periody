@@ -5,7 +5,8 @@ class CustomInputField extends StatelessWidget {
   final String hintText;
   final bool obscureText;
   final TextInputType keyboardType;
-  final bool showAsterisk; // <-- Tambahkan properti baru ini
+  final bool showAsterisk;
+  final TextEditingController? controller;
 
   const CustomInputField({
     super.key,
@@ -13,7 +14,8 @@ class CustomInputField extends StatelessWidget {
     required this.hintText,
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
-    this.showAsterisk = true, // <-- Default-nya true (tetap tampilkan asterisk)
+    this.showAsterisk = true,
+    this.controller,
   });
 
   @override
@@ -30,10 +32,10 @@ class CustomInputField extends StatelessWidget {
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF383838),
+                  fontFamily: 'Nunito',
                 ),
               ),
-              // Gunakan kondisi di sini untuk menampilkan atau menyembunyikan asterisk
-              if (showAsterisk) // <-- Hanya tampilkan jika showAsterisk true
+              if (showAsterisk)
                 TextSpan(
                   text: '*',
                   style: TextStyle(
@@ -47,9 +49,11 @@ class CustomInputField extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         TextField(
+          cursorColor: Color(0xFFF48A8A),
+          controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
-          style: const TextStyle(fontSize: 14), // Tambahkan const jika memungkinkan
+          style: const TextStyle(fontSize: 14),
           decoration: InputDecoration(
             hintText: hintText,
             border: OutlineInputBorder(

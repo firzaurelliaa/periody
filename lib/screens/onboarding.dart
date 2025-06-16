@@ -1,8 +1,7 @@
 // ignore_for_file: use_super_parameters
 
 import 'package:flutter/material.dart';
-import 'package:periody/main.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:periody/screens/auth/login_screen.dart';
 
 class Onboarding extends StatefulWidget {
   const Onboarding({Key? key}) : super(key: key);
@@ -42,7 +41,7 @@ class _OnboardingScreenState extends State<Onboarding> {
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => MyHomePage()),
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
     }
   }
@@ -60,7 +59,7 @@ class _OnboardingScreenState extends State<Onboarding> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Periody",
           style: TextStyle(
             color: Colors.white,
@@ -70,9 +69,9 @@ class _OnboardingScreenState extends State<Onboarding> {
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: false, 
+        automaticallyImplyLeading: false,
       ),
-      backgroundColor: const Color(0xFFF48A8A), 
+      backgroundColor: const Color(0xFFF48A8A),
       body: Stack(
         children: [
           PageView.builder(
@@ -135,7 +134,7 @@ class _OnboardingScreenState extends State<Onboarding> {
                   FloatingActionButton(
                     onPressed: _onNextPage,
                     backgroundColor: const Color(0xFFF48A8A),
-                    foregroundColor: Colors.white, 
+                    foregroundColor: Colors.white,
                     elevation: 0,
                     shape: const CircleBorder(),
                     child: const Icon(Icons.arrow_forward_ios_rounded),
@@ -200,7 +199,7 @@ class _OnboardingScreenState extends State<Onboarding> {
                   title,
                   textAlign: TextAlign.justify,
                   style: const TextStyle(
-                    fontSize: 22,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Color(0xff383838),
                   ),

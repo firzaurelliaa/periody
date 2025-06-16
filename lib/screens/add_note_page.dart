@@ -1,10 +1,10 @@
-// ignore_for_file: use_super_parameters, avoid_print
+// ignore_for_file: use_super_parameters, avoid_print, use_build_context_synchronously, deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:periody/models/menstrual_note.dart';
-import 'package:periody/screens/notepage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AddNotePage extends StatefulWidget {
   const AddNotePage({Key? key}) : super(key: key);
@@ -21,6 +21,8 @@ class _AddNotePageState extends State<AddNotePage> {
   List<String> _selectedGejala = [];
   List<String> _selectedMood = [];
   final TextEditingController _notesController = TextEditingController();
+
+  bool _isLoading = false;
 
   final List<String> _faseOptions = [
     '🩸 Menstruasi',
@@ -105,14 +107,21 @@ class _AddNotePageState extends State<AddNotePage> {
   }
 
   Future<void> _saveNote() async {
-    String userId = 'contohUserId123';
+    setState(() {
+      _isLoading = true;
+    });
 
-    if (userId.isEmpty) {
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
+
+    if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Anda perlu login untuk menyimpan catatan.'),
         ),
       );
+      setState(() {
+        _isLoading = false;
+      });
       return;
     }
 
@@ -171,19 +180,25 @@ class _AddNotePageState extends State<AddNotePage> {
           ),
         );
       }
+      setState(() {
+        _isLoading = false;
+      });
       Navigator.pop(context);
     } catch (e) {
       print('Error saving note: $e');
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Gagal menyimpan catatan: $e')));
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
   Future<void> _loadExistingNote(DateTime date) async {
-    String userId = 'contohUserId123';
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
 
-    if (userId.isEmpty) return;
+    if (userId == null) return;
 
     try {
       final querySnapshot =
@@ -199,7 +214,7 @@ class _AddNotePageState extends State<AddNotePage> {
               .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        final data = querySnapshot.docs.first.data() as Map<String, dynamic>;
+        final data = querySnapshot.docs.first.data();
         setState(() {
           _selectedFase = data['fase'];
           _selectedFlow = data['flow'];
@@ -225,12 +240,16 @@ class _AddNotePageState extends State<AddNotePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffFBFBFB),
+      backgroundColor: const Color(0xffFBFBFB),
       appBar: AppBar(
         centerTitle: true,
         title: const Text(
           'Tambah Catatan',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20.0,
+          ),
         ),
         backgroundColor: const Color(0xffF48A8A),
         elevation: 0,
@@ -259,11 +278,9 @@ class _AddNotePageState extends State<AddNotePage> {
               isSingleSelect: true,
             ),
             const SizedBox(height: 20),
-
             _buildSectionTitle('Aliran Darah'),
             _buildFlowSelection(),
             const SizedBox(height: 20),
-
             _buildSectionTitle('Gejala'),
             _buildImageChoiceChipGrid(
               options: _gejalaOptions,
@@ -279,7 +296,6 @@ class _AddNotePageState extends State<AddNotePage> {
               },
             ),
             const SizedBox(height: 20),
-
             _buildSectionTitle('Suasana Hati'),
             _buildGifChoiceChipGrid(
               options: _moodOptions,
@@ -295,24 +311,21 @@ class _AddNotePageState extends State<AddNotePage> {
               },
             ),
             const SizedBox(height: 20),
-
             _buildSectionTitle('Catatan'),
             TextField(
               controller: _notesController,
-
               decoration: InputDecoration(
                 hintText: 'Masukan catatan',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.0),
                 ),
-
                 filled: true,
                 fillColor: Colors.grey[100],
-                enabledBorder: OutlineInputBorder(
+                enabledBorder: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10.0)),
                   borderSide: BorderSide(color: Colors.grey),
                 ),
-                focusedBorder: OutlineInputBorder(
+                focusedBorder: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10.0)),
                   borderSide: BorderSide(color: Color(0xffF48A8A), width: 2.0),
                 ),
@@ -321,13 +334,12 @@ class _AddNotePageState extends State<AddNotePage> {
               cursorColor: const Color(0xffF48A8A),
             ),
             const SizedBox(height: 30),
-
             Container(
-              margin: EdgeInsets.only(bottom: 40.0),
+              margin: const EdgeInsets.only(bottom: 40.0),
               width: MediaQuery.of(context).size.width,
               height: 48.0,
               child: ElevatedButton(
-                onPressed: _saveNote,
+                onPressed: _isLoading ? null : _saveNote,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xffF48A8A),
                   padding: const EdgeInsets.symmetric(
@@ -337,15 +349,25 @@ class _AddNotePageState extends State<AddNotePage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
+                  disabledBackgroundColor: const Color(0xffF48A8A).withOpacity(0.5),
                 ),
-                child: const Text(
-                  'Simpan',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child: _isLoading
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 3,
+                        ),
+                      )
+                    : const Text(
+                        'Simpan',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
             ),
           ],
@@ -378,13 +400,13 @@ class _AddNotePageState extends State<AddNotePage> {
                 height: 36.0,
                 width: 36.0,
                 padding: EdgeInsets.zero,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Color(0xffFDEDED),
                 ),
                 child: IconButton(
-                  icon: Center(
-                    child: const Icon(
+                  icon: const Center(
+                    child: Icon(
                       Icons.arrow_back_ios,
                       color: Color(0xffF48A8A),
                       size: 20.0,
@@ -401,7 +423,7 @@ class _AddNotePageState extends State<AddNotePage> {
                 ),
               ),
               Text(
-                DateFormat('MMMM dd,yyyy').format(_selectedDate),
+                DateFormat('dd MMMM yyyy', 'id').format(_selectedDate),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -412,13 +434,13 @@ class _AddNotePageState extends State<AddNotePage> {
                 height: 36.0,
                 width: 36.0,
                 padding: EdgeInsets.zero,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Color(0xffFDEDED),
                 ),
                 child: IconButton(
-                  icon: Center(
-                    child: const Icon(
+                  icon: const Center(
+                    child: Icon(
                       Icons.arrow_forward_ios,
                       color: Color(0xffF48A8A),
                       size: 20.0,
@@ -436,7 +458,7 @@ class _AddNotePageState extends State<AddNotePage> {
               ),
             ],
           ),
-          SizedBox(height: 24.0),
+          const SizedBox(height: 24.0),
           SizedBox(
             height: 80,
             child: ListView.builder(
@@ -484,14 +506,14 @@ class _AddNotePageState extends State<AddNotePage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SizedBox(height: 12.0),
+                        const SizedBox(height: 12.0),
                         Text(
-                          DateFormat('EEE').format(displayDate),
+                          DateFormat('EEE', 'id').format(displayDate),
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color:
-                                isSelected ? Colors.white : Color(0xff383838),
+                                isSelected ? Colors.white : const Color(0xff383838),
                           ),
                         ),
                         Text(
@@ -500,10 +522,10 @@ class _AddNotePageState extends State<AddNotePage> {
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color:
-                                isSelected ? Colors.white : Color(0xff383838),
+                                isSelected ? Colors.white : const Color(0xff383838),
                           ),
                         ),
-                        SizedBox(height: 12.0),
+                        const SizedBox(height: 12.0),
                       ],
                     ),
                   ),
@@ -593,15 +615,15 @@ class _AddNotePageState extends State<AddNotePage> {
                     height: 60,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isSelected ? Color(0xffFFE4E4) : Colors.grey[100],
+                      color: isSelected ? const Color(0xffFFE4E4) : Colors.grey[100],
                       border: Border.all(
                         color:
-                            isSelected ? Color(0xffF48A8A) : Colors.grey[300]!,
+                            isSelected ? const Color(0xffF48A8A) : Colors.grey[300]!,
                         width: 1,
                       ),
                     ),
                     child: Container(
-                      padding: EdgeInsets.all(10.0),
+                      padding: const EdgeInsets.all(10.0),
                       child: Image.asset(imagePath, fit: BoxFit.contain),
                     ),
                   ),
@@ -662,15 +684,15 @@ class _AddNotePageState extends State<AddNotePage> {
                       boxShadow:
                           isSelected
                               ? [
-                                BoxShadow(
-                                  color: const Color(
-                                    0xffF48A8A,
-                                  ).withOpacity(0.3),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ]
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xffF48A8A,
+                                    ).withOpacity(0.3),
+                                    spreadRadius: 2,
+                                    blurRadius: 5,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ]
                               : [],
                     ),
                     child: Padding(
@@ -725,11 +747,11 @@ class _AddNotePageState extends State<AddNotePage> {
                     width: 70,
                     height: 70,
                     decoration: BoxDecoration(
-                      color: isSelected ? Color(0xffFDEDED) : Colors.grey[100],
+                      color: isSelected ? const Color(0xffFDEDED) : Colors.grey[100],
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color:
-                            isSelected ? Color(0xffFCDBDB) : Colors.grey[300]!,
+                            isSelected ? const Color(0xffFCDBDB) : Colors.grey[300]!,
                         width: 1,
                       ),
                     ),
